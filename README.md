@@ -228,6 +228,12 @@
               <code>\Sent</code></p>
           </li>
           <li>
+            <p><code>uidNext</code> (number/string) the next UID to be assigned by the folder (should be provided via the IMAP call, although you are allowed to return this in the Open Folder method instead of here if that suits your needs)</p>
+          </li>
+          <li>
+            <p><code>modseq</code> (number/string) the highest modseq value present in the folder (should be provided via the IMAP call, although you are allowed to return this in the Open Folder method instead of here if that suits your needs)</p>
+          </li>
+          <li>
             <p>you may return listed and subscribed attributes if you wish but these are optional and will
               <strong>not</strong> net you extra points</p>
           </li>
@@ -276,10 +282,21 @@
               <li>
                 <p><strong>envelope</strong> (boolean, default true): whether to return envelope information such as
                   recipients, subject line, etc.</p>
+                  <ul>
+                    <li>
+                      Should include at the minimum: date, subject, from/sender, to, cc, bcc
+                    </li>
+                  </ul>
               </li>
               <li>
                 <p><strong>headers</strong> (boolean, default false): whether to return message headers such as Message
                   ID</p>
+                  <ul>
+                    <li>
+                      Should include at the minimum: in-reply-to (if present), message-id, references (if present).
+                    </li>
+                    <li>Extra points awarded to solutions that return all headers (in JSON, you can represent this as <code>{header: headerValue, header2: headerValue2}</code>).</li>
+                  </ul>
               </li>
               <li>
                 <p><strong>bodystructure</strong> (boolean, default false): <strong>optional</strong> whether to return
@@ -293,6 +310,11 @@
               <li>
                 <p><strong>attachments</strong> (boolean, default false): whether to return the attachments (MIME-parsed
                   generally, except if CID is set to true explicitly)</p>
+                  <ul>
+                    <li>
+                      <p>Should include at the minimum: filename, content-type, size, disposition, cid (if inline), checksum, and the content (tip: use a buffer)</p>
+                    </li>
+                  </ul>
               </li>
               <li>
                 <p><strong>parse</strong> (boolean, default true): <strong>optional</strong> this will usually be set to
@@ -428,3 +450,8 @@ Please note that the following are key considerations for the implementation of 
 - The API is stateful. This means that the process must preserve state, e.g. it should handle one mailbox at a time and methods may be delivered in sequence over time (e.g. connect, list folders, fetch messages, wait 5 min, list folders, fetch messages, wait 3 min, move messages, etc)
 - The API is meant to run locally on a device. It should not require complex build steps, containerization or etc., instead opt for a simple, local implementation that compiles to an executable binary.
 - The API should be cross-platform. Solutions that rely on native methods and cannot be cross-compiled to Windows and Mac at a minimum will be marked down. The test suite will run on both Windows and Mac, and the point breakdown between the two is approximately 50/50 (slightly more points will be awarded to Mac implementations, as applicants have met some difficulty in the past with M1 chips and .NET)
+- Be sure to document any caveats of your API. For example, what format JSON it expects, what format JSON it returns, etc.
+  - documentation accounts for 50% of the design mark
+  - be sure to document any design decisions that could be helpful; e.g. most applicants will parse the recipients/cc/bcc fields into structured objects including the name and email address as properties, which is a GREAT design decision and should definitely be documented!
+- When Ye-jin was implementing the API, she found Outlook/Exchange mailservers are much more aggressive about keeping the connection alive. This means that the client must be able to handle the server closing the connection and reconnecting. She recommends applicants to create a free @outlook.com to test with [here](https://outlook.live.com). She also recommends using the Graph Explorer to generate an OAuth token for the XOAUTH2 process (which Outlook requires). **If you have trouble generating this token, please reach out to us and we will provide you with a Node.js project you can run to generate a token as you need it!**
+- Josh tested against GMail. Getting an OAuth token for GMail is a bit more involved. We can't provide this as getting users onto our stack is a bit of a security issue. Instead, make a test account, and generate an app passowrd so you can use Basic Auth.
