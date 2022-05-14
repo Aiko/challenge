@@ -20,6 +20,8 @@ For example, Aiko Mail's RSS feed lives at: https://medium.com/feed/aiko-ai. Ope
 
 We'd like you to take an XML feed from Medium of your choice (it can be ours above), and showcase the articles in a frontend UI.
 
+Here's an example solution: https://aikomail.com/blog/
+
 ## Requirements
 
 Just 3 requirements:
